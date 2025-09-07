@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VISHWA AI</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+
+  <style>
+    /* Spinner Loading Screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 80px;
+      height: 80px;
+      border: 10px solid #fff;
+      border-top: 10px solid #ff4081;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Main Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      font-family: 'Bungee', cursive;
+      font-size: 3rem;
+      margin-top: 30px;
+      text-shadow: 2px 2px 5px #000;
+    }
+
+    .chat-container {
+      margin-top: 40px;
+      width: 90%;
+      max-width: 600px;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      resize: none;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #ff4081;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e91e63;
+    }
+
+    #response {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      white-space: pre-wrap;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: #ccc;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Spinner Loading Screen -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Main Content -->
+  <header>VISHWA AI</header>
+
+  <div class="chat-container">
+    <textarea id="input" placeholder="ඔබේ ප්‍රශ්නය මෙහි ටයිප් කරන්න..."></textarea>
+    <button onclick="askAI()">Send</button>
+    <div id="response"></div>
+  </div>
+
+  <footer>© 2024–2025 CYBER X SHAGI CREATED BY</footer>
+
+  <script>
+    // Show spinner for 2 seconds
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('loading-screen');
+        loader.classList.add('hidden');
+      }, 2000);
+    });
+
+    async function askAI() {
+      const message = document.getElementById('input').value;
+
+      // Safety filter
+      const badWords = ['fuck', 'idiot', 'stupid', 'bitch'];
+      if (badWords.some(word => message.toLowerCase().includes(word))) {
+        document.getElementById('response').innerText = 'ඔබ තාම ඉගෙන ගන්න වයසේ දරුවෙක් අමතකද?';
+        return;
+      }
+
+      // Gemini API call
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyAH-RCiHQua5_DzXEcDGMCrjfDHjs4Fyc4", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: message }] }]
+        })
+      });
+
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "මට ඒක තේරෙන්නේ නැහැ.";
+      document.getElementById('response').innerText = reply;
+    }
+  </script>
+
+</body>
+</html>
